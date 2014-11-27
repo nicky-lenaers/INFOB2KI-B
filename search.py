@@ -130,6 +130,7 @@ def depthFirstSearch(problem):
         for index in xrange(len(parents.list)):
             
             if state == parents.list[index][0]:
+                
                 actions.push(parents.list[index][2])
                 state = parents.list[index][1]
     
@@ -169,14 +170,16 @@ def breadthFirstSearch(problem):
         # Current node is visited, because it will soon be expanded...
         visited.push(fringe.list[-1])
 
+        # Add item to be expanded as the current parent
         parent = fringe.list[-1]
         
         # Loop over successors using xrange loading lazingly
         for index in reversed(xrange(len(successors))):
             
-            if successors[index][0] not in visited.list and successors[index][0] not in fringe.list:
+            if successors[index][0] not in visited.list:
                 
                 fringe.push(successors[index][0])
+                visited.push(successors[index][0])
                 parents.push([successors[index][0], parent, successors[index][1]])
         
         fringe.pop()
@@ -190,6 +193,7 @@ def breadthFirstSearch(problem):
         for index in xrange(len(parents.list)):
             
             if state == parents.list[index][0]:
+                
                 actions.push(parents.list[index][2])
                 state = parents.list[index][1]
     
@@ -212,12 +216,57 @@ def uniformCostSearch(problem):
     UCS takes O(b^(C*/e)) space.
     """
     
-    # Initialize Queue() instances for FIFO datastructure (Source: College 2, Slide 37)
+    # Initialize PriorityQueue() instance for fringe (Source: College 2, Slide 37)
+    fringe = util.PriorityQueue() # Step cost / Total Cost / State Coordinates
+    visited = util.Stack()
+    parents = util.Queue()
+    actions = util.Queue()
     
-    # TODO: Priority Queue
+    # Push first state with priority zero
+    fringe.push(problem.getStartState(), 0)
+    smallest = fringe.pop()
+    # TEMP
+    count = 0
     
+    while not problem.isGoalState(smallest):
+        
+        #smallest = fringe.pop()
+        
+        # First item is lowerst-cost item in the heap
+        successors = problem.getSuccessors(smallest)
+        
+        visited.push(smallest)
+        
+        #if count > 10:
+        #    break
+        
+        # Loop over successors using xrange loading lazingly
+        for index in reversed(xrange(len(successors))):
+
+            if successors[index][0] not in visited.list:
+                
+                # Addition of cost-so-far and cost of successor being pushed to the fringe heap
+                fringe.push(successors[index][0], successors[index][2])                
+                visited.push(successors[index][0])
+                parents.push([successors[index][0], smallest, successors[index][1]])
+
+        #count += 1
+        
+        smallest = fringe.pop()
+        
+    state = smallest
     
-    return ['West']
+    # Build actions
+    while state != problem.getStartState():
+        
+        for index in xrange(len(parents.list)):
+            
+            if state == parents.list[index][0]:
+                
+                actions.push(parents.list[index][2])
+                state = parents.list[index][1]
+
+    return actions.list
 
 def nullHeuristic(state, problem=None):
     """
