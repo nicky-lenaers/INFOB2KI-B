@@ -88,18 +88,13 @@ def depthFirstSearch(problem):
         m = maximum depth of the state space (in this case finite)
     
     DFS takes O(b*m) space because 'black' nodes are removed, resulting in linear space.
-    
-    Fringe using Stack datastructure:
-        [0] = unexplored node
-        [1] = action to get to unexplored node
-        [2] = depth
     """
     
     # Initialize Stack() instances for LIFO datastructure (Source: College 2, Slide 38)
     fringe = util.Stack()
     visited = util.Stack()
-    actions = util.Queue()
     parents = util.Stack()
+    actions = util.Queue()
     
     # Initialize the fringe
     fringe.push([problem.getStartState()])
@@ -126,7 +121,7 @@ def depthFirstSearch(problem):
 
         parents.push(fringe.list[-1])
     
-    # Assign goal item to state to start with when building the list of actions
+    # Assign goal item as first state (actions is build backwards)
     state = fringe.list[-1][0]
     
     # Build actions
@@ -146,16 +141,24 @@ def breadthFirstSearch(problem):
     """ 
     Search the shallowest nodes in the search tree first.
     
-    Code written by: 
+    Code written by:
         Nike Lambooy
         Nicky Lenaers
+        
+    BFS takes O(b^d+1) time with
+        b = maximum branching factor
+        d = depth of the least-cost solution
+        1 = the frist node (root node)
+
+    BFS takes O(b^d+1) space, keeping every node in memory.
     """
     
+    # Initialize Queue() instances for FIFO datastructure (Source: College 2, Slide 32)
     fringe = util.Queue()
-    actions = util.Queue()
     visited = util.Queue()
     parents = util.Queue()
-    
+    actions = util.Queue()
+
     # Initialize the fringe
     fringe.push(problem.getStartState())
 
@@ -178,7 +181,7 @@ def breadthFirstSearch(problem):
         
         fringe.pop()
     
-    # Assign goal item to state to start with when building the list of actions
+    # Assign goal item as first state (actions is build backwards)
     state = fringe.list[-1]
     
     # Build actions
@@ -194,28 +197,27 @@ def breadthFirstSearch(problem):
 
 def uniformCostSearch(problem):
     
-    """Search the node of least total cost first."""
+    """
+    Search the node of least total cost first.
     
-    # Information
-    """ 
     Code written by: 
         Nike Lambooy
         Nicky Lenaers
         
-    We use PriorityQueue() from util.py, taking cost into account.
-        Source: College 2, Slide 37
-
     UCS takes O(b^(C*/e)) time with
         b  = maximum branching factor
         C* = cost of optimal solution
         e  = some positive bound
 
     UCS takes O(b^(C*/e)) space.
-    
-    Fringe using PriorityQueue datastructure:
-        
     """
-    util.raiseNotDefined()
+    
+    # Initialize Queue() instances for FIFO datastructure (Source: College 2, Slide 37)
+    
+    # TODO: Priority Queue
+    
+    
+    return ['West']
 
 def nullHeuristic(state, problem=None):
     """
