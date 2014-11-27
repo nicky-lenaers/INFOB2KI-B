@@ -98,8 +98,8 @@ def depthFirstSearch(problem):
     # Initialize Stack() instances for LIFO datastructure (Source: College 2, Slide 38)
     fringe = util.Stack()
     visited = util.Stack()
-    actions = util.Stack()
-    depth = 0
+    actions = util.Queue()
+    parents = util.Stack()
     
     # Initialize the fringe
     fringe.push([problem.getStartState()])
@@ -111,42 +111,32 @@ def depthFirstSearch(problem):
         # Current node is visited, because it will soon be expanded...
         visited.push(fringe.list[-1][0])
         
+        parent = fringe.list[-1][0]
+        
         # Use pop BEFORE adding items to the fringe, because it removes the last item
         fringe.pop()
-        
-        # Declaration of variables needed when looping over successors being visited
-        hasSuccessors = bool(0)
-        newAction = ""
         
         # Loop over successors using xrange loading lazingly
         for index in reversed(xrange(len(successors))):
 
             if successors[index][0] not in visited.list:
                 
-                hasSuccessors = bool(1)
-                
                 # Push successors to the fringe if not visited
-                fringe.push([successors[index][0], successors[index][1], depth])
-                
-                # Overwtie new action s.t. the last successor's action is defined
-                newAction = successors[index][1]
+                fringe.push([successors[index][0], parent, successors[index][1]])
 
-        if hasSuccessors:
-
-            #Add new action to the list of actions
-            actions.push(newAction)
-           
-        else:
-
-            depth = fringe.list[-1][2]
-
-            # Truncate list of actions based on depth
-            del actions.list[depth:]
+        parents.push(fringe.list[-1])
+    
+    # Assign goal item to state to start with when building the list of actions
+    state = fringe.list[-1][0]
+    
+    # Build actions
+    while state != problem.getStartState():
+        
+        for index in xrange(len(parents.list)):
             
-            # Push newest action based on fringe data
-            actions.push(fringe.list[-1][1])
-
-        depth += 1
+            if state == parents.list[index][0]:
+                actions.push(parents.list[index][2])
+                state = parents.list[index][1]
     
     # Return the actions Pacman will take
     return actions.list
