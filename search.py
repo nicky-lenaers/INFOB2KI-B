@@ -248,7 +248,7 @@ def uniformCostSearch(problem):
             else:
                 prevCost = float("inf")
             
-            if successors[index][0] not in visited.list and successors[index][0] < prevCost:
+            if successors[index][0] not in visited.list and successors[index][2] < prevCost:
                 
                 # Addition of cost-so-far and cost of successor being pushed to the fringe heap
                 fringe.push(successors[index][0], cost + successors[index][2])
@@ -257,8 +257,6 @@ def uniformCostSearch(problem):
                 parents.push([successors[index][0], smallest, successors[index][1], cost + successors[index][2]])
         
         smallest = fringe.pop()
-    
-    #print "SEEN: ", seen
     
     state = smallest
     
