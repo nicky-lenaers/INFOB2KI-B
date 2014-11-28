@@ -217,7 +217,7 @@ def uniformCostSearch(problem):
     """
     
     # Initialize PriorityQueue() instance for fringe (Source: College 2, Slide 37)
-    fringe = util.PriorityQueue() # Step cost / Total Cost / State Coordinates
+    fringe = util.PriorityQueue()
     visited = util.Stack()
     parents = util.Queue()
     actions = util.Queue()
@@ -232,10 +232,11 @@ def uniformCostSearch(problem):
         # First item is lowerst-cost item in the heap
         successors = problem.getSuccessors(smallest)
         
+        # Got successors, so mark as visited
         visited.push(smallest)
-        cost = 0
         
-        # Look for the right parent's cost
+        # Look for the right parent's cost-so-far
+        cost = 0
         for j in range(0, len(parents.list)):
             if smallest == parents.list[j][0]:
                 cost = parents.list[j][3]
@@ -252,12 +253,13 @@ def uniformCostSearch(problem):
                 
                 # Addition of cost-so-far and cost of successor being pushed to the fringe heap
                 fringe.push(successors[index][0], cost + successors[index][2])
-                #visited.push(successors[index][0])
                 seen.update({successors[index][0]: successors[index][2]})
                 parents.push([successors[index][0], smallest, successors[index][1], cost + successors[index][2]])
         
+        # Get the highest priority item from the priority queueu
         smallest = fringe.pop()
     
+    # Only goal state is left in the fringe, so start with that one and travest backwards
     state = smallest
     
     # Build actions
