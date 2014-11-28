@@ -225,8 +225,6 @@ def uniformCostSearch(problem):
     # Push first state with priority zero
     fringe.push(problem.getStartState(), 0)
     smallest = fringe.pop()
-    # TEMP
-    count = 0
     
     while not problem.isGoalState(smallest):
 
@@ -234,9 +232,6 @@ def uniformCostSearch(problem):
         successors = problem.getSuccessors(smallest)
         
         visited.push(smallest)
-        
-        #if count > 10:
-        #    break
         cost = 0
         
         # Look for the right parent's cost
@@ -248,13 +243,11 @@ def uniformCostSearch(problem):
         for index in reversed(xrange(len(successors))):
 
             if successors[index][0] not in visited.list:
-                                
+                
                 # Addition of cost-so-far and cost of successor being pushed to the fringe heap
-                fringe.push(successors[index][0], cost + successors[index][2])                
+                fringe.push(successors[index][0], cost + successors[index][2])
                 visited.push(successors[index][0])
                 parents.push([successors[index][0], smallest, successors[index][1], cost + successors[index][2]])
-
-        #count += 1
         
         smallest = fringe.pop()
         
