@@ -221,6 +221,7 @@ def uniformCostSearch(problem):
     visited = util.Stack()
     parents = util.Queue()
     actions = util.Queue()
+    seen = {}
     
     # Push first state with priority zero
     fringe.push(problem.getStartState(), 0)
@@ -242,15 +243,23 @@ def uniformCostSearch(problem):
         # Loop over successors using xrange loading lazingly
         for index in reversed(xrange(len(successors))):
 
-            if successors[index][0] not in visited.list:
+            if successors[index][0] in seen:
+                prevCost = seen.get(successors[index][0])
+            else:
+                prevCost = float("inf")
+            
+            if successors[index][0] not in visited.list and successors[index][0] < prevCost:
                 
                 # Addition of cost-so-far and cost of successor being pushed to the fringe heap
                 fringe.push(successors[index][0], cost + successors[index][2])
-                visited.push(successors[index][0])
+                #visited.push(successors[index][0])
+                seen.update({successors[index][0]: successors[index][2]})
                 parents.push([successors[index][0], smallest, successors[index][1], cost + successors[index][2]])
         
         smallest = fringe.pop()
-        
+    
+    #print "SEEN: ", seen
+    
     state = smallest
     
     # Build actions
