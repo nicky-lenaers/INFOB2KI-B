@@ -242,9 +242,6 @@ def uniformCostSearch(problem):
             cost = 0
             unseen = True
             
-<<<<<<< HEAD
-            if successors[index][0] not in visited.list and successors[index][2] < prevCost:
-=======
             # If successor is already seen
             for j in range(len(fringe.heap)):
                 if successors[index][0] in fringe.heap[j]:
@@ -252,7 +249,6 @@ def uniformCostSearch(problem):
                     unseen = False
             
             if successors[index][0] not in visited.list and (successors[index][2] < cost or unseen):
->>>>>>> 60c6894ef5ad9be90cab1589079199af5097089a
                 
                 # Addition of cost-so-far and cost of successor being pushed to the fringe heap
                 fringe.push(successors[index][0], totalcost + successors[index][2])
