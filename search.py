@@ -99,6 +99,7 @@ def depthFirstSearch(problem):
     [0] = state (or node) to be expanded
     [1] = list of actions up to this node
     """
+    
     fringe.push([problem.getStartState(), []])
 
     while not fringe.isEmpty():
@@ -122,7 +123,7 @@ def depthFirstSearch(problem):
                 # Push successors' state and actions to the fringe if not visited
                 fringe.push([successors[index][0], actions + [successors[index][1]]])
                 
-        # Current node is visited, because it will soon be expanded...
+        # Current node is visited
         visited.push(state)
 
     return []
