@@ -165,11 +165,15 @@ def breadthFirstSearch(problem):
         
         # Goal test
         if problem.isGoalState(state):
+            #print "ACTIONS: ", actions
             return actions
         
         # Get successors of current state
         successors = problem.getSuccessors(state)
 
+        # Current node is expanded
+        visited.push(state)
+        
         # Loop over successors
         for index in reversed(range(0, len(successors))):
 
@@ -182,9 +186,6 @@ def breadthFirstSearch(problem):
                 # Mark successors as visited
                 visited.push(successors[index][0])
                 
-        # Current node is visited      
-        visited.push(state)
-        
     # Return empty list of actions in case no goal is present
     return []
     
