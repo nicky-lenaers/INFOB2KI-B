@@ -287,8 +287,6 @@ class CornersProblem(search.SearchProblem):
         self._expanded = 0 # DO NOT CHANGE; Number of search nodes expanded
         # Please add any code here which you would like to use
         # in initializing the problem
-        "*** YOUR CODE HERE ***"
-        self.visitedCorners = []
         self.costFn = costFn
 
     def getStartState(self):
@@ -351,19 +349,22 @@ class CornersProblem(search.SearchProblem):
 
             if not hitsWall:
                 
-                successorVisitedCorners = list(visitedCorners)
+                stateVisitedCorners = list(visitedCorners)
                 
                 # Define next state coordinates
                 nextState = (nextx, nexty)
                 
                 # Check if next state is a corner
-                if nextState in self.corners and nextState not in successorVisitedCorners:
+                if nextState in self.corners and nextState not in stateVisitedCorners:
 
                         # Mark corner as visited
-                        successorVisitedCorners.append(nextState)
-                    
+                        stateVisitedCorners.append(nextState)
+                
+                # Cost is calculated using a lambda function in the class constructor
                 cost = self.costFn(nextState)
-                successors.append(((nextState, successorVisitedCorners), action, cost))
+                
+                # Resend the corner as successor s.t. it gets expanded again to continue the path
+                successors.append(((nextState, stateVisitedCorners), action, cost))
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
