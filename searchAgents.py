@@ -296,7 +296,7 @@ class CornersProblem(search.SearchProblem):
         """
         
         # We return a list instead of a state s.t. states never get marked as visited
-        return (self.startingPosition, self.visitedCorners)
+        return (self.startingPosition, [])
 
     def isGoalState(self, state):
         """
