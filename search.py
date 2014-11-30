@@ -126,6 +126,7 @@ def depthFirstSearch(problem):
         # Current node is visited
         visited.push(state)
 
+    # Return empy list of actions in case no goal is present
     return []
 
 def breadthFirstSearch(problem):
@@ -147,49 +148,46 @@ def breadthFirstSearch(problem):
     
     # Initialize Queue() instances for FIFO datastructure (Source: College 2, Slide 32)
     fringe = util.Queue()
-    visited = util.Queue()
-    parents = util.Queue()
-    actions = util.Queue()
+    visited = util.Stack()
+    
+    """
+    Initialize the fringe with following indeces:
+    [0] = state (or node) to be expanded
+    [1] = list of actions up to this node
+    """
+    
+    fringe.push([problem.getStartState(), []])
 
-    # Initialize the fringe
-    fringe.push(problem.getStartState())
+    while not fringe.isEmpty():
+        
+        # Extract deepest node from the fringe
+        state, actions = fringe.pop()
+        
+        # Goal test
+        if problem.isGoalState(state):
+            return actions
+        
+        # Get successors of current state
+        successors = problem.getSuccessors(state)
 
-    while not problem.isGoalState(fringe.list[-1]):
-        
-        successors = problem.getSuccessors(fringe.list[-1])
-        
-        # Current node is visited, because it will soon be expanded...
-        visited.push(fringe.list[-1])
+        # Loop over successors
+        for index in reversed(range(0, len(successors))):
 
-        # Add item to be expanded as the current parent
-        parent = fringe.list[-1]
-        
-        # Loop over successors using xrange loading lazingly
-        for index in reversed(xrange(len(successors))):
-            
+            # Successors can't be visited, so check
             if successors[index][0] not in visited.list:
                 
-                fringe.push(successors[index][0])
-                visited.push(successors[index][0])
-                parents.push([successors[index][0], parent, successors[index][1]])
-        
-        fringe.pop()
-    
-    # Assign goal item as first state (actions is build backwards)
-    state = fringe.list[-1]
-    
-    # Build actions
-    while state != problem.getStartState():
-        
-        for index in xrange(len(parents.list)):
-            
-            if state == parents.list[index][0]:
+                # Push successors' state and actions to the fringe if not visited
+                fringe.push([successors[index][0], actions + [successors[index][1]]])
                 
-                actions.push(parents.list[index][2])
-                state = parents.list[index][1]
+                # Mark successors as visited
+                visited.push(successors[index][0])
+                
+        # Current node is visited      
+        visited.push(state)
+        
+    # Return empy list of actions in case no goal is present
+    return []
     
-    return actions.list
-
 def uniformCostSearch(problem):
     
     """
