@@ -93,49 +93,37 @@ def depthFirstSearch(problem):
     # Initialize Stack() instances for LIFO datastructure (Source: College 2, Slide 38)
     fringe = util.Stack()
     visited = util.Stack()
-    parents = util.Stack()
-    actions = util.Queue()
     
     # Initialize the fringe
-    fringe.push([problem.getStartState()])
+    # 0 = state to ben expanded
+    # 1 = actions up to this node
+    fringe.push([problem.getStartState(), []])
 
-    while not problem.isGoalState(fringe.list[-1][0]):
+    while not fringe.isEmpty():
+        
+        # Extract deepest node from the fringe
+        state, actions = fringe.pop()
+        
+        # Goal test
+        if problem.isGoalState(state):
+            return actions
+        
+        # Get successors of current state
+        successors = problem.getSuccessors(state)
 
-        successors = problem.getSuccessors(fringe.list[-1][0])
-        
-        # Current node is visited, because it will soon be expanded...
-        visited.push(fringe.list[-1][0])
-        
-        parent = fringe.list[-1][0]
-        
-        # Use pop BEFORE adding items to the fringe, because it removes the last item
-        fringe.pop()
-        
-        # Loop over successors using xrange loading lazingly
-        for index in reversed(xrange(len(successors))):
+        # Loop over successors
+        for index in reversed(range(0, len(successors))):
 
+            # Successors can't be visited, so check
             if successors[index][0] not in visited.list:
                 
-                # Push successors to the fringe if not visited
-                fringe.push([successors[index][0], parent, successors[index][1]])
-
-        parents.push(fringe.list[-1])
-    
-    # Assign goal item as first state (actions is build backwards)
-    state = fringe.list[-1][0]
-    
-    # Build actions
-    while state != problem.getStartState():
-        
-        for index in xrange(len(parents.list)):
-            
-            if state == parents.list[index][0]:
+                # Push successors' state and actions to the fringe if not visited
+                fringe.push([successors[index][0], actions + [successors[index][1]]])
                 
-                actions.push(parents.list[index][2])
-                state = parents.list[index][1]
-    
-    # Return the actions Pacman will take
-    return actions.list
+        # Current node is visited, because it will soon be expanded...
+        visited.push(state)
+
+    return []
 
 def breadthFirstSearch(problem):
     
