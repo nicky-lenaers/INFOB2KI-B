@@ -94,9 +94,11 @@ def depthFirstSearch(problem):
     fringe = util.Stack()
     visited = util.Stack()
     
-    # Initialize the fringe
-    # 0 = state to ben expanded
-    # 1 = actions up to this node
+    """
+    Initialize the fringe with following indeces:
+    [0] = state (or node) to be expanded
+    [1] = list of actions up to this node
+    """
     fringe.push([problem.getStartState(), []])
 
     while not fringe.isEmpty():
