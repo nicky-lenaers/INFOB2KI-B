@@ -239,16 +239,16 @@ def uniformCostSearch(problem):
         # Loop over successors using xrange loading lazingly
         for index in reversed(xrange(len(successors))):
 
-            cost = 0
+            stepcost = 0
             unseen = True
             
             # If successor is already seen
             for j in range(len(fringe.heap)):
                 if successors[index][0] in fringe.heap[j]:
-                    cost = fringe.heap[j][0] - totalcost
+                    stepcost = fringe.heap[j][0] - totalcost
                     unseen = False
             
-            if successors[index][0] not in visited.list and (successors[index][2] < cost or unseen):
+            if successors[index][0] not in visited.list and (successors[index][2] < stepcost or unseen):
                 
                 # Addition of cost-so-far and cost of successor being pushed to the fringe heap
                 fringe.push(successors[index][0], totalcost + successors[index][2])
@@ -289,76 +289,66 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     """
     
     # Initialize PriorityQueue() instance for fringe (Source: College 2, Slide 37)
-    fringe = util.PriorityQueue() # Step cost / Total Cost / State Coordinates
+    fringe = util.PriorityQueue()
     visited = util.Stack()
     parents = util.Queue()
     actions = util.Queue()
-    seen = {}
     
-    print "1"
-    
-    """
     # Push first state with priority zero
-    fringe.push(problem.getStartState(), heuristic(problem.getStartState(),problem))
-    smallest = fringe.pop()
+    fringe.push(problem.getStartState(), 0)
+    priority = fringe.pop()
     
-    print "2"
-    
-    while not problem.isGoalState(smallest):
+    while not problem.isGoalState(priority):
 
+        #print "HEURISTIEK: ", heuristic(priority, problem)
+        
         # First item is lowerst-cost item in the heap
-        successors = problem.getSuccessors(smallest)
+        successors = problem.getSuccessors(priority)
         
-        visited.push(smallest)
-        cost = 0
-        
-        # Look for the right parent's cost 
-        for j in range(0, len(parents.list)):
-            if smallest == parents.list[j][0]:
-                cost = parents.list[j][3]
+        # Got successors, so mark as visited
+        visited.push(priority)
+
+        # Get cost-so-far
+        totalcost = problem.getCostOfActions(actions.list)
         
         # Loop over successors using xrange loading lazingly
         for index in reversed(xrange(len(successors))):
 
-            if successors[index][0] in seen:
-                prevCost = seen.get(successors[index][0])
-            else:
-                prevCost = float("inf")
+            stepcost = 0
+            unseen = True
             
-            if successors[index][0] not in visited.list and successors[index][2] < prevCost:
-                
-                # Addition of cost-so-far and cost of successor being pushed to the fringe heap
-                fringe.push(successors[index][0], heuristic(successors[index][0],problem))
-                #visited.push(successors[index][0])
-                seen.update({successors[index][0]: successors[index][2]})
-                parents.push([successors[index][0], smallest, successors[index][1], cost + successors[index][2]])
-        
-        smallest = fringe.pop()
-    
-    #print "SEEN: ", seen
-    
-    state = smallest
-    
-    # Build actions
-    while state != problem.getStartState():
-        
-        for index in xrange(len(parents.list)):
+            # If successor is already seen
+            for j in range(len(fringe.heap)):
+                if successors[index][0] in fringe.heap[j]:
+                    # Set cost to sp
+                    stepcost = fringe.heap[j][0] - totalcost - heuristic(priority, problem)
+                    unseen = False
             
-            if state == parents.list[index][0]:
+            if successors[index][0] not in visited.list and (successors[index][2] < stepcost or unseen):
                 
-                actions.push(parents.list[index][2])
-                state = parents.list[index][1]
+                # Addition of cost-so-far, cost of successor and heuristic cost of successor being pushed to the fringe heap
+                fringe.push(successors[index][0], heuristic(successors[index][0], problem) + totalcost + successors[index][2])
+                parents.push([successors[index][0], priority, successors[index][1]])
+        
+        # Get the highest priority item from the priority queueu
+        state = priority = fringe.pop()
+        
+        # Build actions
+        del actions.list[:]
+        
+        while state != problem.getStartState():
 
-    #return actions.list
-    """
-   
-    return ['West']
-    """
+            for index in xrange(len(parents.list)):
 
+                if state == parents.list[index][0]:
+
+                    actions.push(parents.list[index][2])
+                    state = parents.list[index][1]
+    
+    return actions.list
+    
 # Abbreviations
 bfs = breadthFirstSearch
 dfs = depthFirstSearch
 astar = aStarSearch
 ucs = uniformCostSearch
-
-    """
