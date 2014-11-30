@@ -277,61 +277,55 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     # Initialize PriorityQueue() instance for fringe (Source: College 2, Slide 37)
     fringe = util.PriorityQueue()
     visited = util.Stack()
-    parents = util.Queue()
-    actions = util.Queue()
+    seen = util.Stack()
     
-    # Push first state with priority zero
-    fringe.push(problem.getStartState(), 0)
-    priority = fringe.pop()
+    """
+    Initialize the fringe with following indeces:
+    [0] = state (or node) to be expanded
+    [1] = list of actions up to this node
+    [2] = cost
+    """
     
-    while not problem.isGoalState(priority):
+    fringe.push([problem.getStartState(), []], 0)
 
-        #print "HEURISTIEK: ", heuristic(priority, problem)
+    while not fringe.isEmpty():
         
-        # First item is lowerst-cost item in the heap
+        # Extract deepest node from the fringe
+        priority, actions = fringe.pop()
+        
+        # Goal test
+        if problem.isGoalState(priority):
+            return actions
+        
+        # Get successors of current state
         successors = problem.getSuccessors(priority)
-        
-        # Got successors, so mark as visited
-        visited.push(priority)
 
         # Get cost-so-far
-        totalcost = problem.getCostOfActions(actions.list)
+        totalcost = problem.getCostOfActions(actions)
         
-        # Loop over successors using xrange loading lazingly
-        for index in reversed(xrange(len(successors))):
+        # Loop over successors
+        for index in reversed(range(0, len(successors))):
 
             stepcost = 0
             unseen = True
             
-            # If successor is already seen
+            # Compile a list of seen nodes which will be compared by cost
             for j in range(len(fringe.heap)):
-                if successors[index][0] in fringe.heap[j]:
-                    # Set cost to sp
+                if successors[index][0] == fringe.heap[j][2][0]:
                     stepcost = fringe.heap[j][0] - totalcost - heuristic(priority, problem)
                     unseen = False
             
+            # Successors can't be visited, so check
             if successors[index][0] not in visited.list and (successors[index][2] < stepcost or unseen):
+
+                # Push successors' state, actions and cost to the fringe if not visited
+                fringe.push([successors[index][0], actions + [successors[index][1]]], totalcost + successors[index][2] + heuristic(successors[index][0], problem))
                 
-                # Addition of cost-so-far, cost of successor and heuristic cost of successor being pushed to the fringe heap
-                fringe.push(successors[index][0], heuristic(successors[index][0], problem) + totalcost + successors[index][2])
-                parents.push([successors[index][0], priority, successors[index][1]])
+        # Current node is visited      
+        visited.push(priority)
         
-        # Get the highest priority item from the priority queueu
-        state = priority = fringe.pop()
-        
-        # Build actions
-        del actions.list[:]
-        
-        while state != problem.getStartState():
-
-            for index in xrange(len(parents.list)):
-
-                if state == parents.list[index][0]:
-
-                    actions.push(parents.list[index][2])
-                    state = parents.list[index][1]
-    
-    return actions.list
+    # Return empty list of actions in case no goal is present
+    return []
     
 # Abbreviations
 bfs = breadthFirstSearch
