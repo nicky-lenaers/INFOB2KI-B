@@ -417,7 +417,7 @@ def cornersHeuristic(state, problem):
             unvisitedCorners.push(corner)
 
     # Loop over each unvisited corner we found
-    while len(unvisitedCorners.list) > 0:
+    while not unvisitedCorners.isEmpty():
         
         cornerdistance = []
         
@@ -426,18 +426,18 @@ def cornersHeuristic(state, problem):
             # Get corner distances based on the manhattandistance utility
             cornerdistance.append([util.manhattanDistance(state, corner), corner])
         
-        # From the set of corner, get the closest one using build-in min() function
-        distance = min(cornerdistance)[0]
-        
-        # Add distance to closest corner to heuristics
-        heuristic += distance
-        
         # Update new coordinates to closest corner
         state = min(cornerdistance)[1]
         
         # Remove closest corner to avoid duplicate paths
         unvisitedCorners.list.remove(state)
-
+        
+        # From the set of corner, get the closest one using build-in min() function
+        cost = min(cornerdistance)[0]
+        
+        # Add distance to closest corner to heuristics
+        heuristic += cost
+        
     return heuristic
     
 class AStarCornersAgent(SearchAgent):
