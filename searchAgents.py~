@@ -463,8 +463,54 @@ def foodHeuristic(state, problem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
+    "*** YOUR CODE HERE ***"
+    """
+    teller = 0
     
-    #TO DO: COMMENT ON THIS HEURISTIC
+    
+    #for successor in problem.getSuccessors(state):
+    #    teller += 1
+    #    if position in foodGrid.asList()
+    #        teller -= 1
+    
+    
+    return len(foodGrid.asList())
+    """
+    """
+    #Ricks probeersel
+    print len(foodGrid.asList())
+    #calculate distance to closest food pallet using breadth-first search
+    queue = util.Queue()
+    
+    #push start state
+    #the 2-item list of the current state and current position
+    queue.push([state, [position]])
+    
+    if len(foodGrid.asList()) == 0:
+        return 0
+        
+    
+    #search until there are no more options
+    while not queue.isEmpty():
+        #generate successor states from head of queue
+        currentState = queue.pop()
+        for successor in problem.getSuccessors(currentState[0]):
+            ((newPosition, newFoodGrid), direction, stepSize) = successor
+            #if this successor is unvisited
+            if not newPosition in currentState[1]:
+                #for each, test if at pallet
+                if newPosition in foodGrid.asList():
+                    #if so, return the distance to this node from pacmans position
+                    #print "heuristic from " + str(position) + " to " + str(newPosition) + " is: " + str((0*len(foodGrid.asList()) + len(currentState[1])))
+                    return (0*len(foodGrid.asList()) + len(currentState[1]))
+                #else, add this successor to queue as node [state, list of visited positions] and continue search
+                else:
+                    newVisitedList = currentState[1][:] #make a copy of the list
+                    newVisitedList.append(newPosition) #add the current position 
+                    queue.push([(newPosition, newFoodGrid), newVisitedList])
+    
+    """
+#    print len(foodGrid.asList())
     return len(foodGrid.asList())
 
 class ClosestDotSearchAgent(SearchAgent):
