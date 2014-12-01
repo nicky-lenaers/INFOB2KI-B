@@ -273,7 +273,7 @@ class CornersProblem(search.SearchProblem):
     You must select a suitable state space and successor function
     """
 
-    def __init__(self, startingGameState):
+    def __init__(self, startingGameState, costFn = lambda x: 1):
         """
         Stores the walls, pacman's starting position and corners.
         """
@@ -287,33 +287,40 @@ class CornersProblem(search.SearchProblem):
         self._expanded = 0 # DO NOT CHANGE; Number of search nodes expanded
         # Please add any code here which you would like to use
         # in initializing the problem
-        "*** YOUR CODE HERE ***"
-        self.visitedCorners = []
+        self.costFn = costFn
 
     def getStartState(self):
         """
         Returns the start state (in your state space, not the full Pacman state
         space)
         """
-        "*** YOUR CODE HERE ***"
-        return self.startingPosition
-        #util.raiseNotDefined()
+        
+        # We return a list instead of a state s.t. states never get marked as visited
+        return (self.startingPosition, [])
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         
-        # Goal state of the problem consists of the four corners
-        if state in self.corners and state not in self.visitedCorners:
-            self.visitedCorners.append(state)
-            print "not visited"
-        else:
-            print "done"
-            return True
+        # Initialize the two components of the state parameter
+        visitedCorners = state[1]
+        state = state[0]
+        
+        # Goal state is reached when all four corners are visited
+        if state in self.corners:
             
-
-                
+            # Test visited corners upon goal test in addition to successors test
+            if state not in visitedCorners:
+                visitedCorners.append(state)
+            
+            # All four corners visited, goal is reached
+            if len(visitedCorners) == 4:
+                return True
+        
+        # Continue if goal is not reached yet
+        return False
+ 
     def getSuccessors(self, state):
         """
         Returns successor states, the actions they require, and a cost of 1.
@@ -325,16 +332,40 @@ class CornersProblem(search.SearchProblem):
             is the incremental cost of expanding to that successor
         """
 
+        x = state[0][0]
+        y = state[0][1]
+        visitedCorners = state[1]
+        
         successors = []
+        
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
+            
             # Add a successor state to the successor list if the action is legal
             # Here's a code snippet for figuring out whether a new position hits a wall:
-            #   x,y = currentPosition
-            #   dx, dy = Actions.directionToVector(action)
-            #   nextx, nexty = int(x + dx), int(y + dy)
-            #   hitsWall = self.walls[nextx][nexty]
+            
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            hitsWall = self.walls[nextx][nexty]
 
-            "*** YOUR CODE HERE ***"
+            if not hitsWall:
+                
+                # Build a list for current state visited corners
+                stateVisitedCorners = list(visitedCorners)
+                
+                # Define next state coordinates
+                nextState = (nextx, nexty)
+                
+                # Check if next state is a corner
+                if nextState in self.corners and nextState not in stateVisitedCorners:
+
+                        # Mark corner as visited
+                        stateVisitedCorners.append(nextState)
+                
+                # Cost is calculated using a lambda function in the class constructor
+                cost = self.costFn(nextState)
+                
+                # Resend the corner as successor s.t. it gets expanded again to continue the path
+                successors.append(((nextState, stateVisitedCorners), action, cost))
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
@@ -366,12 +397,49 @@ def cornersHeuristic(state, problem):
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
     """
+    
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
+    
+    # Get values from state parameter, which are defined in the previous exercise
+    visitedCorners = state[1]
+    state = state[0]
+    
+    # Define a list of unvisited corners to keep track of
+    unvisitedCorners = util.Stack()
+    
+    # Start every state with trivial heuristics and build from there
+    heuristic = 0
+    
+    # First, look for all the unvisited corners and build a list
+    for corner in corners:
+        if corner not in visitedCorners:
+            unvisitedCorners.push(corner)
 
-    "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
-
+    # Loop over each unvisited corner we found
+    while not unvisitedCorners.isEmpty():
+        
+        cornerdistance = []
+        
+        for corner in unvisitedCorners.list:
+            
+            # Get corner distances based on the manhattandistance utility
+            cornerdistance.append([util.manhattanDistance(state, corner), corner])
+        
+        # Update new coordinates to closest corner
+        state = min(cornerdistance)[1]
+        
+        # Remove closest corner to avoid duplicate paths
+        unvisitedCorners.list.remove(state)
+        
+        # From the set of corner, get the closest one using build-in min() function
+        cost = min(cornerdistance)[0]
+        
+        # Add distance to closest corner to heuristics
+        heuristic += cost
+        
+    return heuristic
+    
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
     def __init__(self):
@@ -463,54 +531,8 @@ def foodHeuristic(state, problem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
-    "*** YOUR CODE HERE ***"
-    """
-    teller = 0
     
-    
-    #for successor in problem.getSuccessors(state):
-    #    teller += 1
-    #    if position in foodGrid.asList()
-    #        teller -= 1
-    
-    
-    return len(foodGrid.asList())
-    """
-    """
-    #Ricks probeersel
-    print len(foodGrid.asList())
-    #calculate distance to closest food pallet using breadth-first search
-    queue = util.Queue()
-    
-    #push start state
-    #the 2-item list of the current state and current position
-    queue.push([state, [position]])
-    
-    if len(foodGrid.asList()) == 0:
-        return 0
-        
-    
-    #search until there are no more options
-    while not queue.isEmpty():
-        #generate successor states from head of queue
-        currentState = queue.pop()
-        for successor in problem.getSuccessors(currentState[0]):
-            ((newPosition, newFoodGrid), direction, stepSize) = successor
-            #if this successor is unvisited
-            if not newPosition in currentState[1]:
-                #for each, test if at pallet
-                if newPosition in foodGrid.asList():
-                    #if so, return the distance to this node from pacmans position
-                    #print "heuristic from " + str(position) + " to " + str(newPosition) + " is: " + str((0*len(foodGrid.asList()) + len(currentState[1])))
-                    return (0*len(foodGrid.asList()) + len(currentState[1]))
-                #else, add this successor to queue as node [state, list of visited positions] and continue search
-                else:
-                    newVisitedList = currentState[1][:] #make a copy of the list
-                    newVisitedList.append(newPosition) #add the current position 
-                    queue.push([(newPosition, newFoodGrid), newVisitedList])
-    
-    """
-#    print len(foodGrid.asList())
+    #TO DO: COMMENT ON THIS HEURISTIC
     return len(foodGrid.asList())
 
 class ClosestDotSearchAgent(SearchAgent):
@@ -540,9 +562,51 @@ class ClosestDotSearchAgent(SearchAgent):
         food = gameState.getFood()
         walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
+        
+                
+        # Initialize Queue() instances for FIFO datastructure (Source: College 2, Slide 32)
+        fringe = util.Queue()
+        visited = util.Stack()
+        
+        """
+        Initialize the fringe with following indeces:
+        [0] = state (or node) to be expanded
+        [1] = list of actions up to this node
+        """
+        
+        fringe.push([startPosition, []])
 
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        while not fringe.isEmpty():
+            
+            # Extract deepest node from the fringe
+            state, actions = fringe.pop()
+            
+            # Goal test
+            if state in food.asList():
+                return actions
+            
+            # Get successors of current state
+            successors = problem.getSuccessors(state)
+
+            # Current node is expanded
+            visited.push(state)
+            
+            # Loop over successors
+            for index in reversed(range(0, len(successors))):
+
+                # Successors can't be visited, so check
+                if successors[index][0] not in visited.list:
+                    
+                    # Push successors' state and actions to the fringe if not visited
+                    fringe.push([successors[index][0], actions + [successors[index][1]]])
+                    
+                    # Mark successors as visited
+                    visited.push(successors[index][0])
+                    
+        # Return empty list of actions in case no food is present
+        return []
+               
+        
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """

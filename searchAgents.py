@@ -562,9 +562,51 @@ class ClosestDotSearchAgent(SearchAgent):
         food = gameState.getFood()
         walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
+        
+                
+        # Initialize Queue() instances for FIFO datastructure (Source: College 2, Slide 32)
+        fringe = util.Queue()
+        visited = util.Stack()
+        
+        """
+        Initialize the fringe with following indeces:
+        [0] = state (or node) to be expanded
+        [1] = list of actions up to this node
+        """
+        
+        fringe.push([startPosition, []])
 
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        while not fringe.isEmpty():
+            
+            # Extract deepest node from the fringe
+            state, actions = fringe.pop()
+            
+            # Goal test
+            if state in food.asList():
+                return actions
+            
+            # Get successors of current state
+            successors = problem.getSuccessors(state)
+
+            # Current node is expanded
+            visited.push(state)
+            
+            # Loop over successors
+            for index in reversed(range(0, len(successors))):
+
+                # Successors can't be visited, so check
+                if successors[index][0] not in visited.list:
+                    
+                    # Push successors' state and actions to the fringe if not visited
+                    fringe.push([successors[index][0], actions + [successors[index][1]]])
+                    
+                    # Mark successors as visited
+                    visited.push(successors[index][0])
+                    
+        # Return empty list of actions in case no food is present
+        return []
+               
+        
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
