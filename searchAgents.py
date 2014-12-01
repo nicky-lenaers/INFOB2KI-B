@@ -349,6 +349,7 @@ class CornersProblem(search.SearchProblem):
 
             if not hitsWall:
                 
+                # Build a list for current state visited corners
                 stateVisitedCorners = list(visitedCorners)
                 
                 # Define next state coordinates
@@ -396,12 +397,49 @@ def cornersHeuristic(state, problem):
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
     """
+    
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
+    
+    # Get values from state parameter, which are defined in the previous exercise
+    visitedCorners = state[1]
+    state = state[0]
+    
+    # Define a list of unvisited corners to keep track of
+    unvisitedCorners = util.Stack()
+    
+    # Start every state with trivial heuristics and build from there
+    heuristic = 0
+    
+    # First, look for all the unvisited corners and build a list
+    for corner in corners:
+        if corner not in visitedCorners:
+            unvisitedCorners.push(corner)
 
-    "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    # Loop over each unvisited corner we found
+    while len(unvisitedCorners.list) > 0:
+        
+        cornerdistance = []
+        
+        for corner in unvisitedCorners.list:
+            
+            # Get corner distances based on the manhattandistance utility
+            cornerdistance.append([util.manhattanDistance(state, corner), corner])
+        
+        # From the set of corner, get the closest one using build-in min() function
+        distance = min(cornerdistance)[0]
+        
+        # Add distance to closest corner to heuristics
+        heuristic += distance
+        
+        # Update new coordinates to closest corner
+        state = min(cornerdistance)[1]
+        
+        # Remove closest corner to avoid duplicate paths
+        unvisitedCorners.list.remove(state)
 
+    return heuristic
+    
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
     def __init__(self):
